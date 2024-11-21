@@ -10,9 +10,9 @@ class AddBook:
         while True:
             try:
                 print("Введите информацию о книге:")
-                author = input("Введите автора: ")
-                title = input("Название книги: ")
-                year_input = input("Год издания: ")
+                author = input("Введите автора: ").title()
+                title = input("Название книги: ").title()
+                year_input = input("Год издания: ").strip()
                 try:
                     year = int(year_input)
                 except ValueError:
@@ -27,18 +27,28 @@ class AddBook:
                         break
                     else:
                         print("Ошибка: введите 'доступна' или 'выдана'.")
+
                 new_book = Book(id_book=id_book, author=author, title=title, year=year, status=status)
                 json_data = new_book.dict()
                 if not self.duplicate_book(json_data):
                     self.append_book(json_data)
-                another = input("Хотите добавить еще одну книгу? (да/нет): ").strip().lower()
-                if another != 'да':
-                    exit_choice = input("Хотите выйти из приложения? (да/нет): ").strip().lower()
-                    if exit_choice == 'да':
+
+
+                while True:
+                    action = input(
+                        "Что вы хотите сделать дальше? (1 - добавить книгу, "
+                        "2 - вернуться в главное меню, "
+                        "3 - выйти из приложения): ").strip()
+                    if action == '1':
+                        break
+                    elif action == '2':
+                        print("Возвращение в главное меню...")
+                        return
+                    elif action == '3':
                         print("Выход из приложения.")
                         sys.exit()
                     else:
-                        break
+                        print("Ошибка: введите 1, 2 или 3.")
 
             except ValueError as e:
                 print(f"Ошибка ввода. Введите данные заново: {e}")
@@ -53,7 +63,7 @@ class AddBook:
             book_list = []
         except json.JSONDecodeError:
             print("Ошибка при чтении файла JSON.")
-            return False  # Возвращаем False, если ошибка
+            return False
 
         for book in book_list:
             if (json_book['title'].strip().lower() == book['title'].strip().lower() and
@@ -78,9 +88,16 @@ class AddBook:
         return False
 
     def append_book(self, json_book):
-        with open('books.json', 'r', encoding='utf-8') as file:
-            book_uppend = json.load(file)
-            book_uppend.append(json_book)
+        try:
+            with open('books.json', 'r', encoding='utf-8') as file:
+                book_uppend = json.load(file)
+        except FileNotFoundError:
+            book_uppend = []
+        except json.JSONDecodeError:
+            print("Ошибка при чтении файла JSON.")
+            return
+
+        book_uppend.append(json_book)
         with open('books.json', 'w', encoding='utf-8') as file:
             json.dump(book_uppend, file, ensure_ascii=False, indent=2)
             print("Книга добавлена")
