@@ -1,15 +1,35 @@
 import json
 from book.book_class import Book
+from typing import List, Dict, Any
 
 class SearchBook:
-    def search_book_panel(self):
+    """
+    Класс для поиска книг в библиотеке.
+
+    Этот класс предоставляет функциональность для поиска книг по различным критериям,
+    таким как название, автор и год. Данные книг загружаются из файла JSON.
+
+    Attributes:
+        None
+    """
+
+    def search_book_panel(self) -> None:
+        """
+        Отображает панель поиска и обрабатывает выбор пользователя.
+
+        Пользователь может выбрать, по какому критерию искать книги (название, автор, год).
+        Если пользователь решает выйти, программа завершает работу.
+
+        Returns:
+            None
+        """
         while True:
-            search_panel = input("Нажмите 1 для поиска по названию книги\n"
-                                 "Нажмите 2 для поиска по автору книги\n"
-                                 "Нажмите 3 для поиска по году книги\n"
-                                 "Нажмите 4 для выхода\n")
+            search_panel: str = input("Нажмите 1 для поиска по названию книги\n"
+                                      "Нажмите 2 для поиска по автору книги\n"
+                                      "Нажмите 3 для поиска по году книги\n"
+                                      "Нажмите 4 для выхода\n")
             try:
-                choice = int(search_panel)
+                choice: int = int(search_panel)
                 if choice == 1:
                     if not self.search_title():
                         return
@@ -27,17 +47,26 @@ class SearchBook:
             except ValueError:
                 print('Недопустимый ввод, пожалуйста, введите число.')
 
-    def search_title(self):
+    def search_title(self) -> bool:
+        """
+        Ищет книги по названию.
+
+        Запрашивает у пользователя название книги и ищет совпадения в списке книг.
+        Если книга найдена, выводит её данные. Позволяет пользователю продолжить поиск.
+
+        Returns:
+            bool: True, если пользователь хочет продолжить, иначе False.
+        """
         while True:
-            title = input("Введите название: ").strip()
+            title: str = input("Введите название: ").strip()
             if not title:
                 print("Название не может быть пустым.")
                 continue
-            books = self.open_file()
-            found = False
+            books: List[Book] = self.open_file()
+            found: bool = False
             for book in books:
                 if book.title.lower() == title.lower():
-                    self.output(book.dict())
+                    self.output(book.to_dict())
                     found = True
             if not found:
                 print("Книга не найдена.")
@@ -45,17 +74,26 @@ class SearchBook:
                 return False
             return True
 
-    def search_author(self):
+    def search_author(self) -> bool:
+        """
+        Ищет книги по автору.
+
+        Запрашивает у пользователя имя автора и ищет совпадения в списке книг.
+        Если книга найдена, выводит её данные. Позволяет пользователю продолжить поиск.
+
+        Returns:
+            bool: True, если пользователь хочет продолжить, иначе False.
+        """
         while True:
-            author = input("Введите автора: ").strip().title()
+            author: str = input("Введите автора: ").strip().title()
             if not author:
                 print("Автор не может быть пустым.")
                 continue
-            books = self.open_file()
-            found = False
+            books: List[Book] = self.open_file()
+            found: bool = False
             for book in books:
                 if book.author == author:
-                    self.output(book.dict())
+                    self.output(book.to_dict())
                     found = True
             if not found:
                 print("Книга не найдена.")
@@ -63,17 +101,26 @@ class SearchBook:
                 return False
             return True
 
-    def search_year(self):
+    def search_year(self) -> bool:
+        """
+        Ищет книги по году.
+
+        Запрашивает у пользователя год и ищет совпадения в списке книг.
+        Если книга найдена, выводит её данные. Позволяет пользователю продолжить поиск.
+
+        Returns:
+            bool: True, если пользователь хочет продолжить, иначе False.
+        """
         while True:
-            year = input("Введите год: ").strip()
+            year: str = input("Введите год: ").strip()
             if not year.isdigit():
                 print("Пожалуйста, введите корректный год.")
                 continue
-            books = self.open_file()
-            found = False
+            books: List[Book] = self.open_file()
+            found: bool = False
             for book in books:
                 if str(book.year) == year:
-                    self.output(book.dict())
+                    self.output(book.to_dict())
                     found = True
             if not found:
                 print("Книга не найдена.")
@@ -81,10 +128,17 @@ class SearchBook:
                 return False
             return True
 
-    def open_file(self) -> list[Book]:
+    @staticmethod
+    def open_file() -> List[Book]:
+        """
+        Открывает файл с книгами и загружает их в виде объектов Book.
+
+        Returns:
+            List[Book]: Список объектов Book, загруженных из файла.
+        """
         try:
             with open('books.json', 'r', encoding='utf-8') as file:
-                book_data = json.load(file)
+                book_data: List[Dict[str, Any]] = json.load(file)
                 return [Book(**book) for book in book_data]
         except FileNotFoundError:
             print("Файл books.json не найден.")
@@ -93,13 +147,30 @@ class SearchBook:
             print("Ошибка при чтении файла JSON.")
             return []
 
-    def output(self, dict_book):
-        output = ', '.join(f"{key}: {value}" for key, value in dict_book.items())
+    @staticmethod
+    def output(dict_book: Dict[str, Any]) -> None:
+        """
+        Выводит информацию о книге.
+
+        Args:
+            dict_book (Dict[str, Any]): Словарь с данными книги для вывода.
+
+        Returns:
+            None
+        """
+        output: str = ', '.join(f"{key}: {value}" for key, value in dict_book.items())
         print(output)
 
-    def ask_to_continue(self):
+    @staticmethod
+    def ask_to_continue() -> bool:
+        """
+        Запрашивает у пользователя, хочет ли он продолжить поиск.
+
+        Returns:
+            bool: True, если пользователь хочет продолжить, иначе False.
+        """
         while True:
-            response = input("Хотите попробовать снова? (да/нет): ").lower()
+            response: str = input("Хотите попробовать снова? (да/нет): ").lower()
             if response == "да":
                 return True
             elif response == "нет":

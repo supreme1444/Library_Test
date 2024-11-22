@@ -2,9 +2,28 @@ import json
 import os
 import sys
 
+class ChangeStatus:
+    """
+    Класс для изменения статуса книг в библиотеке.
 
-class Сhangestatus:
-    def change_book_status_in_library(self):
+    Этот класс позволяет пользователю изменять статус книг (доступна/выдана)
+    в системе, загружая данные из файла JSON и сохраняя изменения обратно в файл.
+
+    Attributes:
+        None
+    """
+
+    def change_book_status_in_library(self) -> None:
+        """
+        Изменяет статус книги в библиотеке по заданному ID.
+
+        Метод запрашивает у пользователя ID книги, статус которой нужно изменить.
+        Если книга найдена, ее статус меняется с 'доступна' на 'выдана' и наоборот.
+        Изменения сохраняются в файл 'books.json'.
+
+        Returns:
+            None
+        """
         if not os.path.exists('books.json'):
             print("Файл books.json не существует.")
             return
@@ -38,6 +57,7 @@ class Сhangestatus:
             print("Ошибка при чтении файла JSON.")
         except Exception as e:
             print(f"Произошла ошибка: {e}")
+
         while True:
             action = input(
                 "Что вы хотите сделать дальше? (1 - изменить статус еще одной книги, "
